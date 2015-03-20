@@ -1,0 +1,143 @@
+// Define tree nodes
+    public class Node
+    {
+        public char name;
+        public string value;
+        public Node left, right;
+
+        // Constructor to create a single node 
+        public Node(char name, string s)
+        {
+            this.name = name;
+            value = s;
+            left = null;
+            right = null;
+        }
+    }
+
+    public class Tree
+    {
+        Node top;
+        public int increasingLevel = 1;
+        public int level = 1;
+
+        public Tree(char name, string value)
+        {
+            top = new Node(name, value);
+        }
+
+        public void AddRexpressionRc(string value)
+        {
+            AddRexpressionR(ref top, value);
+        }
+
+        private void AddRexpressionR(ref Node N, string v)
+        {
+            var value = Convert.ToInt32(v);
+
+            // Insert node
+            if (N == null)
+            {
+                // ^ = temporary operator 
+                N = new Node('^', value.ToString());
+            }
+
+            // Check prime number
+            if (IsPrime(value) || value == 0 || increasingLevel == level)
+            {
+                return;
+            }
+
+            Random rnd = new Random();
+
+            // Random number
+            int randomNum = rnd.Next(1, (value + 1) / 2);
+            int latterNum = 0;
+            increasingLevel++;
+
+            // Generate operation
+            char[] operators = new char[4] { '+', '-', '*', '/' };
+
+            int random = rnd.Next(1, 5);
+            char opRandom = operators[random - 1];
+
+            N.name = opRandom;
+
+            // Generate value of child node
+            if (opRandom == '+')
+                latterNum = value - randomNum;
+            else if (opRandom == '-')
+                latterNum = value + randomNum;
+            else if (opRandom == '*')
+            {
+                // if undivisible, change to '+'
+                if (value % randomNum == 0)
+                {
+                    latterNum = value / randomNum;
+                }
+                else
+                {
+                    latterNum = value - randomNum;
+                    N.name = '+';
+                }
+            }
+            else if (opRandom == '/')
+                latterNum = value * randomNum;
+
+            AddRexpressionR(ref N.left, latterNum.ToString());
+
+            AddRexpressionR(ref N.right, randomNum.ToString());
+        }
+
+        public bool IsPrime(int num)
+        {
+            int k = 0;
+
+            for (int i = 1; i <= num; i++)
+            {
+                if (num % i == 0)
+                {
+                    k++;
+                }
+            }
+
+            if (k == 2)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public string PrintLeftToRight(Node N)
+        {
+            if (N == null)
+            {
+                N = top;
+            }
+
+            string s = string.Empty;
+
+            // The rule if wrap () for non-leaf
+            if (N.left != null && N.right != null)
+            {
+                return s = "(" + PrintLeftToRight(N.left) + N.name + PrintLeftToRight(N.right) + ")";
+            }
+            else if (N.left == null && N.right == null)
+            {
+                return s = N.value;
+            }
+
+            return s;
+        }
+    }
+    
+    // From client:
+    myTree = new Tree('^', textBox1.Text);
+
+    // Deepth of tree
+    myTree.level = 4;
+    
+    myTree.AddRexpressionRc("20");
+
+    label1.Text = myTree.PrintLeftToRight(null);
