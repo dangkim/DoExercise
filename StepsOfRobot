@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+// Strategy Pattern: reducing condition statement
+
+namespace AutoGenExPart1
+{
+    public interface IMovingStrategy
+    {
+        void Moving(ref Point p);
+    }
+
+    public class LeftMovingStrategy : IMovingStrategy
+    {
+        public void Moving(ref Point p)
+        {
+            // Robot.Left();
+            p.Y--;
+        }
+    }
+
+    public class RightMovingStrategy : IMovingStrategy
+    {
+        public void Moving(ref Point p)
+        {
+            // Robot.Right();
+            p.Y++;
+        }
+    }
+
+    public class ForwardMovingStrategy : IMovingStrategy
+    {
+        public void Moving(ref Point p)
+        {
+            // Robot.Up();
+            p.X++;
+        }
+    }
+
+    public class BackMovingStrategy : IMovingStrategy
+    {
+        public void Moving(ref Point p)
+        {
+            // Robot.Back();
+            p.X--;
+        }
+    }
+
+    public class MovingService
+    {
+        // The solution is DICTIONARY
+        // We use Dictionary data structure to help reducing condition statements when we want to get value from the name 
+        private static Dictionary<Char, IMovingStrategy> _strategies =
+            new Dictionary<Char, IMovingStrategy>();
+
+        public static Point current;
+
+        static MovingService()
+        {
+            current = new Point(5, 5);
+
+            _strategies.Add('L', new LeftMovingStrategy());
+            _strategies.Add('R', new RightMovingStrategy());
+            _strategies.Add('M', new ForwardMovingStrategy());
+            _strategies.Add('B', new BackMovingStrategy());
+        }
+
+        public static void Moving(Char moving)
+        {
+            _strategies[moving].Moving(ref current);
+        }
+    }
+}
+
+// From client
+String ILikeAMoving = "LLRRLLMMBRL";
+foreach (var m in ILikeAMoving)
+{
+    MovingService.Moving(m);
+}
+
+label.Text = MovingService.current.X + ", " + MovingService.current.Y;
